@@ -1,0 +1,17 @@
+{
+  "name": "myapp",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./server"
+  },
+  "dependencies": {
+    "angular": "^1.7.7",
+    "angular-datatables": "^0.6.4",
+    "angular-route": "^1.7.5",
+    "datatables.net-responsive": "^2.2.3",
+    "datatables.net-responsive-dt": "^2.2.3",
+    "moment": "^2.22.2",
+    "ng-file-upload": "^12.2.13"
+  }
+}
