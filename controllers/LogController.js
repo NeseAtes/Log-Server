@@ -1,6 +1,5 @@
 var moment = require("moment");
 var esController = require("./ElasticSearchController");
-
 //var deneme = require("./dene");
 
 var IndexAction = function(req, res, next) {
@@ -43,7 +42,6 @@ var IndexAction = function(req, res, next) {
         values: values
       };
     }
-    
     var conditions = buildConditions();
     var sql = 'SELECT * FROM logs WHERE ' + conditions.where;
     
@@ -85,6 +83,7 @@ var list = function(req,res,next){
                 description: logs[i].description,
                 log_level: logs[i].log_level                     
         };
+
         logbes.push(log);
         }
         res.locals.data = {
@@ -94,10 +93,8 @@ var list = function(req,res,next){
         }
     });
 }
-
 var logSer = require('../WS');
 var AddLog=function(req,res,next){
-
     var logObj = {
         app_name: req.body.app_name == "" ? null : req.body.app_name,
         date: req.body.date == "" ? null : moment(req.body.date, 'DD.MM.YYYY').format('YYYY-MM-DD'),
@@ -124,10 +121,12 @@ var AddLog=function(req,res,next){
                     res.locals.data = {
                         data: true
                     }
+                    
                     next();
                 }
                 logSer.veri(logObj);
-            });   
+            }); 
+
         }
     });
 };

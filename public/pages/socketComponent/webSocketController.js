@@ -13,11 +13,9 @@ app.factory('websocketService', function () {
         }
     }
 ).controller('webSocketController', function ($scope,$http, websocketService) {
-
     $scope.items=[];
     $http.get("http://localhost:3000/api/log/list").then(successCallback, errorCallback);
       function successCallback(response){
-        console.log(response.data.data);
         for (var i = 0; i < response.data.data.length; i++) {
           var a = response.data.data[i]
           if (a.log_level == 1) {
