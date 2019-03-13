@@ -10,7 +10,6 @@ var appconfig = require('./config/app');
 var port = process.env.PORT || appconfig.port;
 var app = express();
 
-
 var ws = require('./WS.js');
 ws.init(app);
 app.use(cookieParser());

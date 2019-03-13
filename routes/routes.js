@@ -18,7 +18,7 @@ module.exports = function(app) {
     app.get('/api/log', BaseController.InitSession, LogController.index, BaseController.EndSession );
     app.post('/api/log/add', BaseController.InitSession, LogController.addlog, BaseController.EndSession);
     app.get('/api/log/list', BaseController.InitSession, LogController.list, BaseController.EndSession);
-    app.get('/api/apps', BaseController.InitSession, AppController.index, BaseController.EndSession );
+    app.get('/api/apps', TokenCtrl.tokenControl,BaseController.InitSession, AppController.index, BaseController.EndSession );
     app.post('/api/apps/add',BaseController.InitSession, AppController.addApps,BaseController.EndSession);
     app.post('/api/apps/update/:app_id', BaseController.InitSession, AppController.updateApps, BaseController.EndSession);
     app.delete('/api/apps/delete/:app_id', BaseController.InitSession, AppController.deleteApps, BaseController.EndSession);
@@ -29,7 +29,7 @@ module.exports = function(app) {
     app.post('/api/es/search', ESController.search);
     app.post('/api/es/mapping', ESController.mapp);
     app.post('/api/es/update/:id', ESController.update);
-    app.get('/tokenControl', TokenCtrl.tokenCtrl);
+    app.get('/tokenControl', TokenCtrl.tokenControl);
    
     var errorHandler = function(err, req, res, next) {
         if (res.locals.connection) {
