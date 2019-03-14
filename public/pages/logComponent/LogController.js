@@ -26,11 +26,9 @@ app.controller('LogController', function($scope, $http, SERVICE_URL, DTOptionsBu
                     $scope.logs = response.data.data;
                     $scope.users = response.data.data;
                     //console.log("logs", $scope.logs);
-
     console.log($scope.users)
     $scope.totalItems = $scope.users.length;
     console.log($scope.users.length);
-
             },
             function(response) {
                 console.log(response);
@@ -65,7 +63,12 @@ app.controller('LogController', function($scope, $http, SERVICE_URL, DTOptionsBu
                $scope.logs.push(a);
             }
             }           
+            $scope.logs=[];
             
+            for (var i = 0; i < resp.data.hits.length; i++) {
+               var a = resp.data.hits[i]._source;
+               $scope.logs.push(a);
+            } 
         },function(err){
             console.log("ES err: ", err);
         });

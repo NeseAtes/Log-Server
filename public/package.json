@@ -9,10 +9,15 @@
     "angular": "^1.7.7",
     "angular-datatables": "^0.6.4",
     "angular-route": "^1.7.5",
+<<<<<<< HEAD
     "angular-ui-bootstrap": "^2.5.6",
     "angular-utils-pagination": "^0.11.1",
+=======
+    "axios": "^0.18.0",
+>>>>>>> a9346feff287dc91ae735a2e491e0e39d63c7bd7
     "datatables.net-responsive": "^2.2.3",
     "datatables.net-responsive-dt": "^2.2.3",
+    "jsonwebtoken": "^8.5.0",
     "moment": "^2.22.2",
     "ng-file-upload": "^12.2.13"
   }
