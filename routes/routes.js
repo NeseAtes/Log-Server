@@ -11,17 +11,17 @@ module.exports = function(app) {
 
     app.use(cookieParser())
 
-    app.get('/',HomeController.index);  
+    app.get('/',TokenCtrl.tokenControl,HomeController.index);  
     app.post('/login',BaseController.InitSession,UserController.login,BaseController.EndSession);  
-    app.get('/api/user',BaseController.InitSession,UserController.getAllUsers,BaseController.EndSession);
-    app.post('/api/user/add',BaseController.InitSession,UserController.AddUser,BaseController.EndSession);
+    app.get('/api/user',TokenCtrl.tokenControl,BaseController.InitSession,UserController.getAllUsers,BaseController.EndSession);
+    app.post('/api/user/add',TokenCtrl.tokenControl,BaseController.InitSession,UserController.AddUser,BaseController.EndSession);
     app.get('/api/log', BaseController.InitSession, LogController.index, BaseController.EndSession );
     app.post('/api/log/add', BaseController.InitSession, LogController.addlog, BaseController.EndSession);
     app.get('/api/log/list', BaseController.InitSession, LogController.list, BaseController.EndSession);
     app.get('/api/apps', TokenCtrl.tokenControl,BaseController.InitSession, AppController.index, BaseController.EndSession );
-    app.post('/api/apps/add',BaseController.InitSession, AppController.addApps,BaseController.EndSession);
-    app.post('/api/apps/update/:app_id', BaseController.InitSession, AppController.updateApps, BaseController.EndSession);
-    app.delete('/api/apps/delete/:app_id', BaseController.InitSession, AppController.deleteApps, BaseController.EndSession);
+    app.post('/api/apps/add',TokenCtrl.tokenControl,BaseController.InitSession, AppController.addApps,BaseController.EndSession);
+    app.post('/api/apps/update/:app_id', TokenCtrl.tokenControl,BaseController.InitSession, AppController.updateApps, BaseController.EndSession);
+    app.delete('/api/apps/delete/:app_id', TokenCtrl.tokenControl,BaseController.InitSession, AppController.deleteApps, BaseController.EndSession);
     app.post('/api/log/update/:log_id', BaseController.InitSession, LogController.updateLog, BaseController.EndSession);
     app.delete('/api/log/delete/:log_id', BaseController.InitSession, LogController.deleteLog, BaseController.EndSession);
     app.post('/api/es/createIndex',  ESController.createIndex);

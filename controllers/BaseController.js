@@ -3,7 +3,6 @@ var db = require("../lib/db");
 
 var InitSession = function(req, res, next)
 {
-    console.log(res.locals.data)
     db.getConnection(function(err, connection) {
         if (err) {        
             next(err);
