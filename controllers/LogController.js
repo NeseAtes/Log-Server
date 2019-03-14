@@ -95,6 +95,54 @@ var list = function(req,res,next){
     });
 }
 
+var pagList = function(req,res,next) {
+    var connection = res.locals.connection;
+    var sayfa = [];
+    var ofvalue = req.query.ofvalue * 10 || req.body.ofvalue * 10;
+    connection.query("SELECT * FROM logs LIMIT 20 OFFSET " + ofvalue, function(err,logs){
+        if (err) {
+            next(err);
+        } else {
+            for (var i in logs) {
+                var log = {
+                    log_id: logs[i].log_id,
+                    app_name: logs[i].app_name,
+                    date: moment(logs[i].date).format("DD.MM.YYYY"),
+                    description: logs[i].description,
+                    log_level: logs[i].log_level
+                };
+                sayfa.push(log);
+            }
+            res.locals.data = {
+            data: sayfa
+            }
+            next();   
+        }
+    });
+}
+
+var sayfasayi = function(req,res,next){
+    var connection = res.locals.connection;
+    connection.query("SELECT COUNT(*) as total FROM logs",  function(err,logs){
+        console.log(logs);
+        if (err) {
+            next(err);
+        } else {
+            for (var i in logs) {
+                var log = {
+                    sayi: logs[i].total
+                };
+                console.log(logs[i].total);
+            }
+            res.locals.data = {
+            data: log
+            }
+            next();   
+        }
+
+    });
+}
+
 var logSer = require('../WS');
 var AddLog=function(req,res,next){
 
@@ -182,3 +230,5 @@ module.exports.list= list;
 module.exports.addlog = AddLog;
 module.exports.updateLog= UpdateLog;
 module.exports.deleteLog=DeleteLog;
+module.exports.pagList=pagList;
+module.exports.sayi=sayfasayi;
