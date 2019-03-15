@@ -14,5 +14,8 @@ app.config(function($routeProvider,$locationProvider){
   }).when('/', {
   	templateUrl: './pages/socketComponent/webSocket.html',
   	controller: 'webSocketController'
+  }).when('/login',{
+    templateUrl:'./pages/loginComponent/login.html',
+    controller:'loginController'
   });
 });
