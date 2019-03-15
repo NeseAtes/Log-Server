@@ -29,7 +29,16 @@ module.exports = function(app) {
     app.post('/api/es/search', ESController.search);
     app.post('/api/es/mapping', ESController.mapp);
     app.post('/api/es/update/:id', ESController.update);
+
    
+
+    app.get('/api/log/list', BaseController.InitSession, LogController.list, BaseController.EndSession);
+    app.post('/api/log/paglist', BaseController.InitSession, LogController.pagList, BaseController.EndSession);
+    app.get('/api/log/sayi',BaseController.InitSession, LogController.sayi, BaseController.EndSession);
+    //app.post('/api/ws/look', WebSocketServerController.dblook);
+   //z app.post('/api/es/bulk', ESController.bulklama);
+    app.get('/tokenControl', TokenCtrl.tokenControl);
+
     var errorHandler = function(err, req, res, next) {
         if (res.locals.connection) {
             res.locals.connection.release();

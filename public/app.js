@@ -1,4 +1,4 @@
-var app = angular.module('myApp',['ngRoute', 'datatables', 'ngFileUpload']);
+var app = angular.module('myApp',['ngRoute', 'datatables', 'ngFileUpload' ,'ui.bootstrap','dibari.angular-ellipsis' ]);
 
 angular.forEach(config,function(key,value) {
   app.constant(value,key);

@@ -40,56 +40,106 @@
   </div>
 </div>
 <style type="text/css">
-  table{
+  table{ 
     table-layout: fixed;
+    border-collapse: collapse;
   }
+  tbody{
+    display:block;
+    width: 100%;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    height: 400px;
+  }
+  tr{
+    width: 100%;
+    display: block;
+  }
+  th{
+    padding: 5px;
+    text-align: left;
+    width: 200px;
+  }
+  /*.deal-collapse{
+  white-space: nowrap;
+  text-overflow:ellipsis; 
+  width:100px;
+  overflow:hidden;
+  }
+  .deal-expand{
+    text-overflow:inherit;
+    overflow: visible;
+  }*/
+  /*.aa{/*
+    overflow: hidden;/*taşmayı gizleme
+    white-space: nowrap;/*alt satırı gösterme, alt satıra inme.
+    text-overflow: ellipsis;/*üç nokta
+    text-align: left;"/*
+    width: 80px;/*
+    word-wrap:break-word;/*yazıyı sığsırma*/
+  /*}
+  /*table td:nth-child(odd) {
+    width: 200px;
+  }
+  table td:nth-child(even) {
+    width: 200px;
+  }*/
 </style>
 
 <div class="box-header">
   <h3 class="box-title">Log List</h3>    
 </div>
 <!-- /.box-header -->
-<div class="box-body">
-  <input style="float: right; margin: 0px 5px;" type="text" ng-model="elastic" ng-keyup="yolla()">
-  <label style="float: right;">Search</label>
-  <br><br>
-  <table dt-options="dtOptions" class="table table-bordered table-hover table-responsive">
-    <thead>
-      <tr>
-        <th class="a">Log Id</th>
-        <th class="a">Application Name</th>
-        <th class="a">Date</th>
-        <th class="a">Description</th>
-        <th class="a">Log Level</th>
-      </tr>
-    </thead> 
-    <tbody>
-      <tr ng-repeat="log in logs">
-        <td>
-          {{ log.log_id }}
-        </td>             
-        <td>
-          {{ log.app_name }}
-        </td>              
-        <td>
-          {{ log.date }}
-        </td>              
-        <td>
-          {{ log.description }}
-        </td>
-        <td>
-          {{ log.log_level }}
-        </td>                
-      </tr>
-    </tbody>
-  </table> 
+  <div class="row">
+    <div class="box-body">
+      <input style="float: right; margin: 0px 5px;" type="text" ng-model="elastic" ng-change="yolla()">
+      <label style="float: right;">Search</label>
+      <br><br>
+      <table class="table table-bordered table-hover table-responsive">
+        <thead>
+          <tr>
+            <th>Log Id</th>
+            <th>Application Name</th>
+            <th>Date</th>
+            <th>Description</th>
+            <th>Log Level</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="log in users.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage))">
+            <td style="width: 200px; text-align: left;">
+              {{ log.log_id }}
+            </td>             
+            <td style="width: 200px; text-align: left;">
+              {{ log.app_name }}
+            </td>              
+            <td style="width: 200px; text-align: left;">
+              {{ log.date }}
+            </td> 
+            <td style="width: 200px; text-align: left;" ng-click="show=!show" style="text-overflow: hidden;">
+              <p ng-if="show"> {{ log.description }} </p>
+              <p ng-if="!show" ng-bind="log.description | limitTo:10"></p>
+              <p ng-if="log.description.length>15 && !show">...</p>
+            </td>             
+            <td style="width: 200px; text-align: left; ">
+              {{ log.log_level }}
+            </td>                
+          </tr>
+        </tbody>
+      </table> 
+      </div>
+    </div>
+
+  <!--p data-ng-bind="paragraphText" data-ellipsis data-ellipsis-append="scope.appendString" data-ellipsis-append-click="showFullText()"></p-->
+
+  <div uib-pagination total-items="totalItems" ng-model="currentPage" ng-change="pageChanged()" class=" pagination-sm pagination" previous-text="&lsaquo;" max-size="6" boundary-link-numbers="true" next-text="&rsaquo;" items-per-page="itemsPerPage"></div>
+  <pre>The selected page no: {{currentPage}}</pre>
+
+ </div>
 </div>
 
-</div>
-</div>
 <script type="text/javascript">
   $(function() {
-
     $('#date').datepicker({
       autoclose: true,
       format: 'yyyy.mm.dd',
