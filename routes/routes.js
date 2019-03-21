@@ -27,7 +27,7 @@ module.exports = function(app) {
     app.post('/api/es/createIndex',  ESController.createIndex);
     app.post('/api/es/addDocument', ESController.addDocument);
     app.post('/api/es/search', ESController.search);
-    app.post('/api/es/mapping', ESController.mapp);
+    app.get('/api/es/mapping', ESController.mapp);
     app.post('/api/es/update/:id', ESController.update);
     app.get('/api/log/list', BaseController.InitSession, LogController.list, BaseController.EndSession);
     app.post('/api/log/paglist', BaseController.InitSession, LogController.pagList, BaseController.EndSession);

@@ -1,12 +1,12 @@
-app.controller('LogController', function($scope, $http, $interval, SERVICE_URL, DTOptionsBuilder, DTColumnDefBuilder, $location) {
+app.controller('LogController', function($scope, $http, $filter, $interval, SERVICE_URL, DTOptionsBuilder, DTColumnDefBuilder, $location) {
     $scope.logs = [];
     $scope.users =[];
 
     $scope.viewby = 10;
-    $scope.currentPage = 4;
+    $scope.currentPage = 1;
 
     $scope.itemsPerPage = $scope.viewby;
-    $scope.maxSize = 5;
+    //$scope.maxSize = 5;
 
 
     $scope.pageChanged = function() {
@@ -26,7 +26,7 @@ app.controller('LogController', function($scope, $http, $interval, SERVICE_URL, 
                     $scope.logs = response.data.data;
                     $scope.users = response.data.data;
                     //console.log("logs", $scope.logs);
-    console.log($scope.users)
+    //console.log($scope.users)
     $scope.totalItems = $scope.users.length;
     console.log($scope.users.length);
             },
@@ -50,47 +50,133 @@ app.controller('LogController', function($scope, $http, $interval, SERVICE_URL, 
         $http.post("http://localhost:3000/api/es/search", JSON.stringify(data))
         .then(function(resp){
             console.log("ES sonuc: ", resp.data.hits);
-        $scope.logs=[];
+        //$scope.logs=[];
         $scope.users=[];
             console.log($scope.logs); 
             if ($scope.elastic == "") {
                 $scope.getAllLogs()
             }
             else{
+            $scope.logs=[];
+            $scope.users=[];
                 for (var i = 0; i < resp.data.hits.length; i++) {
                var a = resp.data.hits[i]._source;
                console.log(resp.data.hits[i]._source);
-               $scope.logs.push(a);
+               //$scope.logs.push(a);
                $scope.users.push(a);
-            }
-            }           
-            $scope.logs=[];
-            $scope.users=[];
 
-            for (var i = 0; i < resp.data.hits.length; i++) {
+            }
+            } 
+            $scope.totalItems = $scope.users.length;
+            $scope.currentPage = 1;
+            
+            /*for (var i = 0; i < resp.data.hits.length; i++) {
                var a = resp.data.hits[i]._source;
                $scope.logs.push(a);
                $scope.users.push(a);
-            } 
+
+            }*/
         },function(err){
             console.log("ES err: ", err);
         });
     }
 
-    
-    /*var i = 1;
-    $scope.ellipsisText = "But wait, there's more";
 
-    $scope.paragraphText = "Four score and seven years ago our fathers brought forth on this continent, a new nation, conceived in Liberty, and dedicated to the proposition that all men are created equal. Now we are engaged in a great civil war, testing whether that nation, or any nation so conceived and so dedicated, can long endure. We are met on a great battle-field of that war. We have come to dedicate a portion of that field, as a final resting place for those who here gave their lives that that nation might live. It is altogether fitting and proper that we should do this. But, in a larger sense, we can not dedicate, we can not consecrate, we can not hallow, this ground. The brave men, living and dead, who struggled here, have consecrated it, far above our poor power to add or detract. The world will little note, nor long remember what we say here, but it can never forget what they did here. It is for us the living, rather, to be dedicated here to the unfinished work which they who fought here have thus far so nobly advanced.";
+    $scope.getFilteredData = function(res,error)
+    {
+        var veri= "";
+        if ($scope.filters.app_name == undefined && $scope.filters.date === undefined && $scope.filters.log_level === undefined ) 
+        {
+            $window.alert('boş')
+        }
+        if ($scope.filters.app_name !== undefined) {
+            if (veri === "") {
+                veri+="?";
+            }
+            else{
+                veri+="&";
+            }
+            veri+='app_name='+$scope.filters.app_name;
+        }
+        if ($scope.filters.date !== undefined) {
+            if (veri === "") {
+                veri+="?";
+            }
+            else{
+                veri+="&";
+            }
+            veri+='date='+$scope.filters.date;
+        }
+        if ($scope.filters.log_level !== undefined) {
+            if (veri === "") {
+                veri+="?";
+            }
+            else{
+                veri+="&";
+            }
+            veri+='log_level='+$scope.filters.log_level;
+        }
+        
+        
+        console.log("gcv",veri);
+        
 
-    $interval(function() {
-        $scope.incrementing = "But wait, there's more x" + i;
-        i++;
-    }, 1000);
-
-    $scope.showFullText = function() {
-        alert('On click function');
-    };*/
-
-
+        $http.get('http://localhost:3000/api/log' +veri)
+        .then(function(resp) {
+            $scope.users = [];
+                if (resp.data.error){
+                    console.log("hata",resp.data.error);
+                }
+                else{
+                $scope.users = [];
+                console.log("aa", resp);
+                $scope.users = resp.data.data;
+                console.log("bb", resp.data.data);
+                } 
+            $scope.totalItems = $scope.users.length;
+            $scope.currentPage = 1;
+            //$scope.filters.app_name = $scope.users[0];
+            //$scope.filters.log_level = $scope.users[0];
+        });
+    }
 });
+
+app.filter('unique', function () {
+
+        return function (items, filterOn) {
+
+            
+            if (filterOn === false) {
+                return items;
+            }
+
+            if ((filterOn || angular.isUndefined(filterOn)) && angular.isArray(items)) {
+                var hashCheck = {}, newItems = [];
+
+                var extractValueToCompare = function (item) {
+                    if (angular.isObject(item) && angular.isString(filterOn)) {
+                        return item[filterOn];
+                    } else {
+                        return item;
+                    }
+                };
+
+                angular.forEach(items, function (item) {
+                    var valueToCheck, isDuplicate = false;
+
+                    for (var i = 0; i < newItems.length; i++) {
+                        if (angular.equals(extractValueToCompare(newItems[i]), extractValueToCompare(item))) {
+                            isDuplicate = true;
+                            break;
+                        }
+                    }
+                    if (!isDuplicate) {
+                        newItems.push(item);
+                    }
+
+                });
+                items = newItems;
+            }
+            return items;
+        };
+    });
