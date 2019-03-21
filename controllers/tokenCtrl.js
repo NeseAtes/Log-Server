@@ -1,7 +1,7 @@
 var jwt = require('jsonwebtoken');
 
 var token= function(data){
-  var token = jwt.sign(data, 'supersecret',{expiresIn: 300});   //private key=> supersecret
+  var token = jwt.sign(data, 'supersecret',{expiresIn: 30});   //private key=> supersecret
   return {token:token}
 }
 var tokenControl=function(req, res,next) {

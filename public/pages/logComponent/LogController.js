@@ -42,7 +42,6 @@ app.controller('LogController', function($scope, $http, $interval, SERVICE_URL, 
 
 
     $scope.yolla = function(){
-
         var data = {
             value : $scope.elastic
         };

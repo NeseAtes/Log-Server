@@ -12,7 +12,8 @@ module.exports = function(app) {
     app.use(cookieParser())
 
     app.get('/',HomeController.index);  
-    app.post('/login',BaseController.InitSession,UserController.login,BaseController.EndSession);  
+    app.post('/login',BaseController.InitSession,UserController.login,BaseController.EndSession); 
+    app.get('/logout',UserController.logout); 
     app.get('/api/user',TokenCtrl.tokenControl,BaseController.InitSession,UserController.getAllUsers,BaseController.EndSession);
     app.post('/api/user/add',TokenCtrl.tokenControl,BaseController.InitSession,UserController.AddUser,BaseController.EndSession);
     app.get('/api/log',TokenCtrl.tokenControl, BaseController.InitSession, LogController.index, BaseController.EndSession );
@@ -26,11 +27,9 @@ module.exports = function(app) {
     app.delete('/api/log/delete/:log_id',TokenCtrl.tokenControl, BaseController.InitSession, LogController.deleteLog, BaseController.EndSession);
     app.post('/api/es/createIndex',  ESController.createIndex);
     app.post('/api/es/addDocument', ESController.addDocument);
-    app.post('/api/es/search', ESController.search);
-    app.post('/api/es/mapping', ESController.mapp);
-    app.post('/api/es/update/:id', ESController.update);
-
-   
+    app.post('/api/es/search', TokenCtrl.tokenControl,ESController.search);
+    app.get('/api/es/mapping', ESController.mapp);
+    app.post('/api/es/update/:id', ESController.update); 
 
     app.get('/api/log/list', BaseController.InitSession, LogController.list, BaseController.EndSession);
     app.post('/api/log/paglist', BaseController.InitSession, LogController.pagList, BaseController.EndSession);

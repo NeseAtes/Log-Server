@@ -70,6 +70,12 @@ var login=function(req,res,next){
         }
 	});
 }
+var logout=function(req,res,next){
+    res.clearCookie('auth');
+    
+    res.send({message:'OK'})
+}
+module.exports.logout=logout;
 module.exports.login=login;
 module.exports.getAllUsers=getAllUsers;
 module.exports.AddUser=addUser;

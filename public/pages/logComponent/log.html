@@ -60,30 +60,10 @@
     text-align: left;
     width: 200px;
   }
-  /*.deal-collapse{
-  white-space: nowrap;
-  text-overflow:ellipsis; 
-  width:100px;
-  overflow:hidden;
-  }
-  .deal-expand{
-    text-overflow:inherit;
-    overflow: visible;
-  }*/
-  /*.aa{/*
-    overflow: hidden;/*taşmayı gizleme
-    white-space: nowrap;/*alt satırı gösterme, alt satıra inme.
-    text-overflow: ellipsis;/*üç nokta
-    text-align: left;"/*
-    width: 80px;/*
-    word-wrap:break-word;/*yazıyı sığsırma*/
-  /*}
-  /*table td:nth-child(odd) {
+  td{
     width: 200px;
+    text-align: left;"
   }
-  table td:nth-child(even) {
-    width: 200px;
-  }*/
 </style>
 
 <div class="box-header">
@@ -116,7 +96,7 @@
             <td style="width: 200px; text-align: left;">
               {{ log.date }}
             </td> 
-            <td style="width: 200px; text-align: left;" ng-click="show=!show" style="text-overflow: hidden;">
+            <td style="width: 200px; text-align: left;" ng-click="show=!show" style="overflow: hidden;">
               <p ng-if="show"> {{ log.description }} </p>
               <p ng-if="!show" ng-bind="log.description | limitTo:10"></p>
               <p ng-if="log.description.length>15 && !show">...</p>
