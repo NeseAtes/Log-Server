@@ -30,7 +30,11 @@ module.exports = function(app) {
     app.post('/api/es/search', TokenCtrl.tokenControl,ESController.search);
     app.get('/api/es/mapping', ESController.mapp);
     app.post('/api/es/update/:id', ESController.update); 
+    app.post('/api/es/search', ESController.search);
+    app.get('/api/es/mapping', ESController.mapp);
+    app.post('/api/es/update/:id', ESController.update);
 
+   
     app.get('/api/log/list', BaseController.InitSession, LogController.list, BaseController.EndSession);
     app.post('/api/log/paglist', BaseController.InitSession, LogController.pagList, BaseController.EndSession);
     app.get('/api/log/sayi',BaseController.InitSession, LogController.sayi, BaseController.EndSession);

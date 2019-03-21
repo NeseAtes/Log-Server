@@ -8,12 +8,11 @@ var IndexAction = function(req, res, next) {
     var logArr = [];
     var connection = res.locals.connection;
 
-    var log_id=req.params.log_id;
-    var app_name = req.query.app_name;
-    var date = req.query.date;
-    var log_level = req.query.log_level;
-
-
+    var log_id=req.params.log_id||req.body.log_id;
+    var app_name = req.query.app_name||req.body.app_name;
+    var date = req.query.date||req.body.date;
+    var log_level = req.query.log_level||req.body.log_level;
+    console.log(req.query);
     function buildConditions()
     {
       var conditions = [];
@@ -21,20 +20,20 @@ var IndexAction = function(req, res, next) {
 
         if (typeof app_name !== 'undefined')
         {
-            conditions.push("app_name like ?");
-            values.push("%" + app_name + "%");
+            conditions.push("app_name = ?");
+            values.push(app_name);
         }
 
         if (typeof date  !== 'undefined')
         {
-            conditions.push("date ?");
+            conditions.push("date = ?");
             values.push(date);
         }
 
         if (typeof log_level !== 'undefined') 
         {
-            conditions.push("log_level like ?");
-            values.push("%" + log_level + "%");
+            conditions.push("log_level = ?");
+            values.push(log_level);
         }
 
       return {
@@ -45,6 +44,8 @@ var IndexAction = function(req, res, next) {
     }
     var conditions = buildConditions();
     var sql = 'SELECT * FROM logs WHERE ' + conditions.where;
+    console.log("xx",conditions);
+    
     connection.query(sql,conditions.values , function(err, logs) {
         if (err) {
             next(err);
@@ -58,6 +59,7 @@ var IndexAction = function(req, res, next) {
                 log_level: logs[i].log_level                     
         };
         logArr.push(log);
+        console.log(req.query);
         }
         res.locals.data = {
             data: logArr

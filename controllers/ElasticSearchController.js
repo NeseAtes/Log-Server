@@ -134,7 +134,7 @@ var mapp = function(req,res,next){
 				properties: {
 					log_id: { type: 'integer'},
 					app_name: { type: 'text'},
-					//date: { type: 'date'},
+					date: { type: 'date', format: 'strict_date_optional_time||epoch_mill'},
 					description: { type: 'text'},
 					log_level: { type: 'text'}
 				}
