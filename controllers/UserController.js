@@ -51,7 +51,7 @@ var login=function(req,res,next){
 	var password=req.body.password;
 	connection.query("SELECT * FROM users WHERE username=? AND password=?", [username,password], function(err,users){
 		if (err) throw err;
-    	else{ //if user is exist
+    	else if(users.length!=0){ //if user is exist
     		var userid = {
                 user_id : users[0].user_id
             };               
@@ -60,10 +60,14 @@ var login=function(req,res,next){
             //save it 
             res.cookie('auth',token);
             res.locals.data = {
+                is_user:true,
                 data: token
             }
             next();
     	}
+        else{
+            return res.send({is_user:false,message: 'Please check the information' });
+        }
 	});
 }
 module.exports.login=login;

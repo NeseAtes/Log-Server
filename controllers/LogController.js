@@ -3,6 +3,8 @@ var esController = require("./ElasticSearchController");
 //var deneme = require("./dene");
 
 var IndexAction = function(req, res, next) {
+    var userid=res.locals.data.data.user_id;  
+
     var logArr = [];
     var connection = res.locals.connection;
 
@@ -33,16 +35,17 @@ var IndexAction = function(req, res, next) {
             conditions.push("log_level = ?");
             values.push(log_level);
         }
-    
+
       return {
         where: conditions.length ?
-                 conditions.join(' AND ') : '1',
+                 conditions.join(' AND ') : 'user_id='+"'"+userid+"'",
         values: values
       };
     }
     var conditions = buildConditions();
     var sql = 'SELECT * FROM logs WHERE ' + conditions.where;
     console.log("xx",conditions);
+    
     connection.query(sql,conditions.values , function(err, logs) {
         if (err) {
             next(err);
@@ -67,10 +70,12 @@ var IndexAction = function(req, res, next) {
 };
 
 var list = function(req,res,next){
+    var userid=res.locals.data.data.user_id;  
+
     var connection = res.locals.connection;
-    var sonbes = 'SELECT * FROM logs Order By log_id DESC LIMIT 5'
+    var sonbes = 'SELECT * FROM logs where user_id=? Order By log_id DESC LIMIT 5'
     var logbes = [];
-    connection.query(sonbes, function(err, logs) {
+    connection.query(sonbes,[userid], function(err, logs) {
         if (err) {
             next(err);
         } else {
@@ -143,11 +148,14 @@ var sayfasayi = function(req,res,next){
 
 var logSer = require('../WS');
 var AddLog=function(req,res,next){
+    var userid=res.locals.data.data.user_id;  
+
     var logObj = {
         app_name: req.body.app_name == "" ? null : req.body.app_name,
         date: req.body.date == "" ? null : moment(req.body.date, 'DD.MM.YYYY').format('YYYY-MM-DD'),
         description: req.body.description,
-        log_level: req.body.log_level       
+        log_level: req.body.log_level,
+        user_id:userid
     };
     var connection = res.locals.connection;
     connection.query("Insert into logs set ?", logObj, function(err, result) {
