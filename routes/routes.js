@@ -14,30 +14,30 @@ module.exports = function(app) {
     app.get('/',HomeController.index);  
     app.post('/login',BaseController.InitSession,UserController.login,BaseController.EndSession); 
     app.get('/logout',UserController.logout); 
+
     app.get('/api/user',TokenCtrl.tokenControl,BaseController.InitSession,UserController.getAllUsers,BaseController.EndSession);
     app.post('/api/user/add',TokenCtrl.tokenControl,BaseController.InitSession,UserController.AddUser,BaseController.EndSession);
+
     app.get('/api/log',TokenCtrl.tokenControl, BaseController.InitSession, LogController.index, BaseController.EndSession );
     app.post('/api/log/add',TokenCtrl.tokenControl, BaseController.InitSession, LogController.addlog, BaseController.EndSession);
     app.get('/api/log/list', TokenCtrl.tokenControl,BaseController.InitSession, LogController.list, BaseController.EndSession);
+
     app.get('/api/apps', TokenCtrl.tokenControl,BaseController.InitSession, AppController.index, BaseController.EndSession );
     app.post('/api/apps/add',TokenCtrl.tokenControl,BaseController.InitSession, AppController.addApps,BaseController.EndSession);
     app.post('/api/apps/update/:app_id', TokenCtrl.tokenControl,BaseController.InitSession, AppController.updateApps, BaseController.EndSession);
     app.delete('/api/apps/delete/:app_id', TokenCtrl.tokenControl,BaseController.InitSession, AppController.deleteApps, BaseController.EndSession);
+
     app.post('/api/log/update/:log_id', TokenCtrl.tokenControl,BaseController.InitSession, LogController.updateLog, BaseController.EndSession);
     app.delete('/api/log/delete/:log_id',TokenCtrl.tokenControl, BaseController.InitSession, LogController.deleteLog, BaseController.EndSession);
+
     app.post('/api/es/createIndex',  ESController.createIndex);
     app.post('/api/es/addDocument', ESController.addDocument);
     app.post('/api/es/search', TokenCtrl.tokenControl,ESController.search);
     app.get('/api/es/mapping', ESController.mapp);
-    app.post('/api/es/update/:id', ESController.update); 
-    app.post('/api/es/search', ESController.search);
-    app.get('/api/es/mapping', ESController.mapp);
     app.post('/api/es/update/:id', ESController.update);
 
-   
-    app.get('/api/log/list', BaseController.InitSession, LogController.list, BaseController.EndSession);
-    app.post('/api/log/paglist', BaseController.InitSession, LogController.pagList, BaseController.EndSession);
-    app.get('/api/log/sayi',BaseController.InitSession, LogController.sayi, BaseController.EndSession);
+    app.post('/api/log/paglist',TokenCtrl.tokenControl ,BaseController.InitSession, LogController.pagList, BaseController.EndSession);
+    app.get('/api/log/sayi',TokenCtrl.tokenControl,BaseController.InitSession, LogController.sayi, BaseController.EndSession);
     //app.post('/api/ws/look', WebSocketServerController.dblook);
    //z app.post('/api/es/bulk', ESController.bulklama);
     app.get('/tokenControl', TokenCtrl.tokenControl);
