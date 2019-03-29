@@ -102,7 +102,7 @@ var search = function(req,res,next){
 				must: {
 					multi_match: {
         				query:    value,
-        				fields:   ['app_name', 'description' , 'date' , 'log_level']
+        				fields:   ['app_name', 'description' , 'log_level']
     				}
 				}
 				/*filter: {

@@ -1,76 +1,46 @@
 var moment = require("moment");
-var esController = require("./ElasticSearchController");
+var mainCtrl=require('./MainController')
+var mongodb = require('mongodb');
+var logSer = require('../WS');
+var db = require("../lib/db");
 
 var IndexAction = function(req, res, next) {
-    var userid=res.locals.data.data.user_id;  
-
-    var logArr = [];
-    var log_id=req.params.log_id||req.body.log_id;
-    var app_name = req.query.app_name||req.body.app_name;
-    var date = req.query.date||req.body.date;
-    var log_level = req.query.log_level||req.body.log_level;
     function buildConditions()
     {
-        var logConditions={user_id:userid};
+        var logConditions={"user_id":res.locals.data.data.user_id};
 
-        if (typeof app_name !== 'undefined')
+        var log_id=req.params.log_id||req.body.log_id;
+        var app_name = req.query.app_name||req.body.app_name;
+        var date = req.query.date||req.body.date;
+        var log_level = req.query.log_level||req.body.log_level;
+        if (app_name != undefined)
             logConditions["app_name"]=app_name;
-        if (typeof date  !== 'undefined')
+        if (date  != undefined)
             logConditions["date"]=date;
-        if (typeof log_level !== 'undefined')
+        if (log_level != undefined)
             logConditions["log_level"]=log_level;
 
       return logConditions;
     }
+
+    var database=db.getDb();
     var conditions = buildConditions();
-    var database=res.locals.database;
-    database.collection("logs").find(conditions)
-    .toArray(function(err,result){
-        if (err) {
-            next(err);
-        } else {
-        for (var i in result) {
-            var log = {             
-                log_id: result[i].log_id,
-                app_name: result[i].app_name,
-                date: moment(result[i].date).format("DD.MM.YYYY"),
-                description: result[i].description,
-                log_level: result[i].log_level                     
-        };
-        logArr.push(log);
-        }
-        res.locals.data = {
-            data: logArr
-        }
-        next();
-        }
-    });
-};
+
+    mainCtrl.getAll(database,"logs",conditions,res,next);
+
+}
 
 var list = function(req,res,next){
     var userid=res.locals.data.data.user_id;  
-    var database=res.locals.database;
-    var logbes = [];
+    var database=db.getDb();
 
     database.collection("logs").
-    find({user_id:userid}).limit(5).sort({_id:-1}).
-    toArray(function(err,result){
+    find({user_id:userid}).limit(5).sort({_id:-1}).toArray(function(err,result){
         if (err) {
             next(err);
         } else {
-        for (var i in result) {
-            var log = {             
-                log_id: result[i]._id,
-                app_name: result[i].app_name,
-                date: moment(result[i].date).format("DD.MM.YYYY"),
-                description: result[i].description,
-                log_level: result[i].log_level                     
-        };
-
-        logbes.push(log);
-        }
         res.locals.data = {
-            data: logbes
+            data: result
         }
         next();
         }
@@ -78,9 +48,8 @@ var list = function(req,res,next){
 }
 
 var pagList = function(req,res,next) {
-    var database=res.locals.database;
+    var database=db.getDb();
     var userid=res.locals.data.data.user_id;  
-    var sayfa = [];
 
     var ofvalue = req.query.ofvalue * 10 || req.body.ofvalue * 10;
     database.collection("logs").find({user_id:userid}).skip(ofvalue).limit(20).toArray(function(err,result){
@@ -88,18 +57,8 @@ var pagList = function(req,res,next) {
             console.log(err)
         }
         else{
-            for (var i in result) {
-                var log = {
-                    log_id: result[i].log_id,
-                    app_name: result[i].app_name,
-                    date: moment(result[i].date).format("DD.MM.YYYY"),
-                    description: result[i].description,
-                    log_level: result[i].log_level
-                };
-                sayfa.push(log);
-            }
             res.locals.data = {
-            data: sayfa
+                data: result
             }
             next(); 
         }
@@ -107,24 +66,19 @@ var pagList = function(req,res,next) {
 }
 
 var sayfasayi = function(req,res,next){
-    var database=res.locals.database;
+    var database=db.getDb();
     var userid=res.locals.data.data.user_id;  
-
-    database.logs.find({user_id:userid}).count(function(err,result){
+ 
+   database.collection("logs").find({user_id:userid}).count(function(err,result){
         if(err) throw err;
-        else{
-            var log={
-                sayi:result
-            };
-            res.locals.data={
-                data:log
-            }
-            next();
-        }
-    });
+        res.locals.data={
+            sayi:result
+        };
+        next();
+   });
+
 }
 
-var logSer = require('../WS');
 var AddLog=function(req,res,next){
     var userid=res.locals.data.data.user_id;  
 
@@ -135,68 +89,30 @@ var AddLog=function(req,res,next){
         log_level: req.body.log_level,
         user_id:userid
     };
-    var database=res.locals.database;
-    database.collection("logs").insertOne(logObj,function(err,result){
-        if(err) throw err;
-        else{
-            logObj.insertId = result.insertId;
-            esController.addDocumentInner(logObj, function(error, result){
-                console.log("addDocumentInner: ", error, result);
-                if(error) {
-                    res.locals.data = {
-                        data: false,
-                        error: error
-                    }
-                    next();
-                }else {
-                    res.locals.data = {
-                        data: true
-                    }
-                    
-                    next();
-                }
-                logSer.veri(logObj);
-            });
-        }
-    });
+    var database=db.getDb();
+    mainCtrl.add(database,"logs",logObj,res,next);
 };
-var mongodb = require('mongodb');
 
 var UpdateLog=function(req,res,next){
-    var database=res.locals.database;
+    var database=db.getDb();
     var myquery={_id:new mongodb.ObjectId(req.params.log_id)}
     var newVal={};
-    if(req.body.app_name!="")
-        newVal["app_name"]=req.body.app_name;
-    if(req.body.date!="")
-        newVal["date"]=moment(req.body.date, 'DD.MM.YYYY').format('YYYY-MM-DD');
-    if(req.body.description!="")
-        newVal["description"]=req.body.description;
-    if(req.body.log_level!="")
-        newVal["log_level"]=req.body.log_level;
-    database.collection("logs").update(myquery,newVal,function(err,result){
+    database.collection("logs").find(myquery).toArray(function(err,result){
         if(err) throw err;
-        else{
-            res.locals.data={
-                data: true
-            };
-            next();
-        }
+
+        newVal["app_name"]=req.body.app_name==undefined?result[0].app_name:req.body.app_name;
+        newVal["date"]=req.body.date==undefined?result[0].date:moment(req.body.date, 'DD.MM.YYYY').format('YYYY-MM-DD');
+        newVal["description"]=req.body.description==undefined?result[0].description:req.body.description;
+        newVal["log_level"]=req.body.log_level==undefined?result[0].log_level:req.body.log_level;
+        newVal["user_id"]=result[0].user_id;
+
+        mainCtrl.update(database,"logs",myquery,newVal,res,next);    
     });
-    
 };
 var DeleteLog=function(req,res,next){
-    var database=res.locals.database;
+    var database=db.getDb();
     var id={_id:new mongodb.ObjectId(req.params.log_id)}
-    database.collection("logs").deleteOne(id,function(err,obj){
-        if(err) throw err;
-        else{
-            res.locals.data={
-                data: true            
-            };
-            next();
-        }
-    });
+    mainCtrl.deleteData(database,"logs",id,res,next);
 };
   
 module.exports.index = IndexAction;

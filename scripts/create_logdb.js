@@ -16,6 +16,10 @@ MongoClient.connect(url, function(err, db) {
     if (err) throw err;
     console.log("App detail Collection created!");
   });
+  dbo.createCollection("user_register_requests", function(err, res) {
+    if (err) throw err;
+    console.log("user register requests Collection created!");
+  });
   db.close();
 
 });

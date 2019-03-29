@@ -1,77 +1,40 @@
+var mainCtrl=require('./MainController')
+var mongodb = require('mongodb');
+var db = require("../lib/db");
+
 var IndexAction = function(req, res, next) {
-    var appArr = [];
-    var database=res.locals.database;
-    var userid=res.locals.data.data.user_id;  
-    database.collection("app_detail").find({}).toArray(function(err,result){
-        if(err) throw err;
-        else{
-            for(var i in result){
-                var app=result[i];
-                appArr.push(app);
-            }
-            res.locals.data={
-                data:appArr
-            }
-            next();
-        }
-    }); 
+    var database=db.getDb();
+    var userid=res.locals.data.data.user_id; 
+    mainCtrl.getAll(database,"app_detail",{"user_id":userid},res,next);
 };   
 
 var AddApps=function(req,res,next){
     var userid=res.locals.data.data.user_id;  
-    var app_veri={
-        app_ip:req.body.app_ip == "" ? null : req.body.app_ip,
-        hostname:req.body.hostname,
-        version:req.body.version,
-        user_id:userid   
-    };
-
-    var database=res.locals.database;
-    database.collection("app_detail").insertOne(app_veri,function(err,result){
-        if(err) throw err;
-        else{
-            res.locals.data={data:true};
-            next();
-        }
-    });
+    var app_veri=req.body;
+    app_veri["user_id"]=userid;
+    var database=db.getDb();
+    mainCtrl.add(database,"app_detail",app_veri,res,next);
 };
-var mongodb = require('mongodb');
 
 var UpdateApps=function(req,res,next){
-    var database=res.locals.database;
+    var database=db.getDb();
     var myquery={_id:new mongodb.ObjectId(req.params.app_id)}
     var app_veri={};
-    if(req.body.app_ip!="")
-        newVal["app_ip"]=req.body.app_ip;
-    if(req.body.hostname!="")
-        newVal["hostname"]=req.body.hostname;
-    if(req.body.version!="")
-        newVal["version"]=req.body.version;
-    database.collection("app_detail").update(myquery,app_veri,function(err,result){
-        if (err) {
-            next(err);
-        }
-        else{
-            res.locals.data={
-                data : true
-            };
-            next();
-        }
+    database.collection("app_detail").find(myquery).toArray(function(err,result){
+        if(err) throw err;
+        app_veri["app_ip"]=req.body.app_ip==undefined?result[0].app_ip:req.body.app_ip;
+        app_veri["hostname"]=req.body.hostname==undefined?result[0].hostname:req.body.hostname;
+        app_veri["version"]=req.body.version==undefined?result[0].version:req.body.version;
+        app_veri["user_id"]=result[0].user_id;
+
+        mainCtrl.update(database,"app_detail",myquery,app_veri,res,next);
     });
 };
 
 var DeleteApps=function(req,res,next){
-    var database=res.locals.database;
+    var database=db.getDb();
     var id={_id:new mongodb.ObjectId(req.params.app_id)}
-    database.collection("app_detail").deleteOne(id,function(err,obj){
-        if(err) throw err;
-        else{
-            res.locals.data={
-                data: true            
-            };
-            next();
-        }
-    });
+    mainCtrl.deleteData(database,"app_detail",id,res,next);
 };
 
 module.exports.index = IndexAction;

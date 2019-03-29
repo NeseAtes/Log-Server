@@ -1,34 +1,38 @@
 var LogController = require("../controllers/LogController");
-var BaseController = require("../controllers/BaseController");
 var AppController = require("../controllers/AppController");
 var HomeController = require("../controllers/HomeController");
 var ESController= require("../controllers/ElasticSearchController");
 var UserController=require("../controllers/UserController");
+var BaseController=require("../controllers/BaseController");
+var AdminController=require("../controllers/AdminController");
 var TokenCtrl = require("../controllers/tokenCtrl");
-var cookieParser = require('cookie-parser')
+var cookieParser = require('cookie-parser');
+var db = require("../lib/db");
+
 
 module.exports = function(app) {
 
     app.use(cookieParser())
-
     app.get('/',HomeController.index);  
-    app.post('/login',BaseController.InitSession,UserController.login,BaseController.EndSession); 
-    app.get('/logout',UserController.logout); 
+    app.post('/login',UserController.login,BaseController.EndSession); 
+    app.get('/logout',UserController.logout);
+    app.get('/tokenControl', TokenCtrl.tokenControl); 
 
-    app.get('/api/user',TokenCtrl.tokenControl,BaseController.InitSession,UserController.getAllUsers,BaseController.EndSession);
-    app.post('/api/user/add',TokenCtrl.tokenControl,BaseController.InitSession,UserController.AddUser,BaseController.EndSession);
+    app.get('/api/user',TokenCtrl.tokenControl,UserController.getAllUsers,BaseController.EndSession);
+    app.post('/api/user/add',UserController.addUser,BaseController.EndSession);
 
-    app.get('/api/log',TokenCtrl.tokenControl, BaseController.InitSession, LogController.index, BaseController.EndSession );
-    app.post('/api/log/add',TokenCtrl.tokenControl, BaseController.InitSession, LogController.addlog, BaseController.EndSession);
-    app.get('/api/log/list', TokenCtrl.tokenControl,BaseController.InitSession, LogController.list, BaseController.EndSession);
+    app.get('/api/log',TokenCtrl.tokenControl, LogController.index,BaseController.EndSession);
+    app.post('/api/log/add',TokenCtrl.tokenControl, LogController.addlog,BaseController.EndSession);
+    app.get('/api/log/list', TokenCtrl.tokenControl, LogController.list,BaseController.EndSession);
+    app.post('/api/log/update/:log_id', TokenCtrl.tokenControl, LogController.updateLog,BaseController.EndSession);
+    app.delete('/api/log/delete/:log_id',TokenCtrl.tokenControl, LogController.deleteLog,BaseController.EndSession);
+    app.post('/api/log/paglist',TokenCtrl.tokenControl , LogController.pagList,BaseController.EndSession);
+    app.get('/api/log/sayi',TokenCtrl.tokenControl, LogController.sayi,BaseController.EndSession);
 
-    app.get('/api/apps', TokenCtrl.tokenControl,BaseController.InitSession, AppController.index, BaseController.EndSession );
-    app.post('/api/apps/add',TokenCtrl.tokenControl,BaseController.InitSession, AppController.addApps,BaseController.EndSession);
-    app.post('/api/apps/update/:app_id', TokenCtrl.tokenControl,BaseController.InitSession, AppController.updateApps, BaseController.EndSession);
-    app.delete('/api/apps/delete/:app_id', TokenCtrl.tokenControl,BaseController.InitSession, AppController.deleteApps, BaseController.EndSession);
-
-    app.post('/api/log/update/:log_id', TokenCtrl.tokenControl,BaseController.InitSession, LogController.updateLog, BaseController.EndSession);
-    app.delete('/api/log/delete/:log_id',TokenCtrl.tokenControl, BaseController.InitSession, LogController.deleteLog, BaseController.EndSession);
+    app.get('/api/apps', TokenCtrl.tokenControl, AppController.index,BaseController.EndSession);
+    app.post('/api/apps/add',TokenCtrl.tokenControl, AppController.addApps,BaseController.EndSession);
+    app.post('/api/apps/update/:app_id', TokenCtrl.tokenControl, AppController.updateApps,BaseController.EndSession);
+    app.delete('/api/apps/delete/:app_id', TokenCtrl.tokenControl, AppController.deleteApps,BaseController.EndSession);
 
     app.post('/api/es/createIndex',  ESController.createIndex);
     app.post('/api/es/addDocument', ESController.addDocument);
@@ -36,16 +40,14 @@ module.exports = function(app) {
     app.get('/api/es/mapping', ESController.mapp);
     app.post('/api/es/update/:id', ESController.update);
 
-    app.post('/api/log/paglist',TokenCtrl.tokenControl ,BaseController.InitSession, LogController.pagList, BaseController.EndSession);
-    app.get('/api/log/sayi',TokenCtrl.tokenControl,BaseController.InitSession, LogController.sayi, BaseController.EndSession);
-    //app.post('/api/ws/look', WebSocketServerController.dblook);
-   //z app.post('/api/es/bulk', ESController.bulklama);
-    app.get('/tokenControl', TokenCtrl.tokenControl);
+    app.get('/api/admin/requests',AdminController.get_userRequests,BaseController.EndSession);
+    app.post('/api/admin/requests/add',AdminController.add_request,BaseController.EndSession);
+    app.delete('/api/admin/requests/negativeReq',AdminController.negative_answer,BaseController.EndSession);
+    app.post('/api/admin/requests/positiveReq',AdminController.positive_answer,BaseController.EndSession);
+
 
     var errorHandler = function(err, req, res, next) {
-        if (res.locals.connection) {
-            res.locals.connection.release();
-        }
+        db.closeConnection();
         res.json({
             data: null,
             error: err
@@ -53,5 +55,3 @@ module.exports = function(app) {
     };
     app.use(errorHandler);
 };
-
-//module.exports = function(wsapp){}
