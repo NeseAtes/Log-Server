@@ -60,7 +60,7 @@ var login=function(req,res,next){
 
 var logout=function(req,res,next){
     res.clearCookie('auth');
-    db.closeConnection();
+    //db.closeConnection();
     res.send({message:'OK'})
 }
 module.exports.logout=logout;

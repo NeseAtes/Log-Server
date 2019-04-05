@@ -1,5 +1,6 @@
 var moment = require("moment");
 var mainCtrl=require('./MainController')
+var chartCtrl=require('./ChartController')
 var mongodb = require('mongodb');
 var logSer = require('../WS');
 var db = require("../lib/db");
@@ -65,20 +66,6 @@ var pagList = function(req,res,next) {
     });
 }
 
-var sayfasayi = function(req,res,next){
-    var database=db.getDb();
-    var userid=res.locals.data.data.user_id;  
- 
-   database.collection("logs").find({user_id:userid}).count(function(err,result){
-        if(err) throw err;
-        res.locals.data={
-            sayi:result
-        };
-        next();
-   });
-
-}
-
 var AddLog=function(req,res,next){
     var userid=res.locals.data.data.user_id;  
 
@@ -91,6 +78,7 @@ var AddLog=function(req,res,next){
     };
     var database=db.getDb();
     mainCtrl.add(database,"logs",logObj,res,next);
+    chartCtrl.addChartData(req,res,next);
 };
 
 var UpdateLog=function(req,res,next){
@@ -99,19 +87,26 @@ var UpdateLog=function(req,res,next){
     var newVal={};
     database.collection("logs").find(myquery).toArray(function(err,result){
         if(err) throw err;
-
+        console.log(result[0])
         newVal["app_name"]=req.body.app_name==undefined?result[0].app_name:req.body.app_name;
         newVal["date"]=req.body.date==undefined?result[0].date:moment(req.body.date, 'DD.MM.YYYY').format('YYYY-MM-DD');
         newVal["description"]=req.body.description==undefined?result[0].description:req.body.description;
         newVal["log_level"]=req.body.log_level==undefined?result[0].log_level:req.body.log_level;
         newVal["user_id"]=result[0].user_id;
-
-        mainCtrl.update(database,"logs",myquery,newVal,res,next);    
+        mainCtrl.update(database,"logs",myquery,newVal,res,next);
+          
+        if(req.body.log_level!=undefined){
+            var data={body:newVal};
+            chartCtrl.addChartData(data,res,next);
+            data.body.log_level=result[0].log_level;
+            chartCtrl.deleteChartData(data,res,next); 
+        }  
     });
 };
 var DeleteLog=function(req,res,next){
     var database=db.getDb();
     var id={_id:new mongodb.ObjectId(req.params.log_id)}
+    chartCtrl.deleteChartData(req,res,next);
     mainCtrl.deleteData(database,"logs",id,res,next);
 };
   
@@ -121,4 +116,3 @@ module.exports.addlog = AddLog;
 module.exports.updateLog= UpdateLog;
 module.exports.deleteLog=DeleteLog;
 module.exports.pagList=pagList;
-module.exports.sayi=sayfasayi;

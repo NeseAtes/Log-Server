@@ -90,7 +90,7 @@
         <tbody>
           <tr ng-repeat="log in users.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage))">
             <td style="width: 200px; text-align: left;">
-              {{ log.log_id }}
+              {{ log._id }}
             </td>             
             <td style="width: 200px; text-align: left;">
               {{ log.app_name }}

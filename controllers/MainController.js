@@ -1,4 +1,5 @@
 var esController = require("./ElasticSearchController");
+var chartController = require("./ChartController");
 var logSer = require('../WS');
 var add=function(database,tablename,data,res,next){
     database.collection(tablename).insertOne(data, function(err,result){
