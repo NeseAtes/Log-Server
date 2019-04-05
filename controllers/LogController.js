@@ -106,8 +106,13 @@ var UpdateLog=function(req,res,next){
 var DeleteLog=function(req,res,next){
     var database=db.getDb();
     var id={_id:new mongodb.ObjectId(req.params.log_id)}
-    chartCtrl.deleteChartData(req,res,next);
-    mainCtrl.deleteData(database,"logs",id,res,next);
+    database.collection("logs").find(id).toArray(function(err,result){
+        if(err) throw err;
+        console.log(result)
+        req.body=result[0];
+        chartCtrl.deleteChartData(req,res,next);
+    });
+    mainCtrl.deleteData(database,"logs",id,res,next); 
 };
   
 module.exports.index = IndexAction;

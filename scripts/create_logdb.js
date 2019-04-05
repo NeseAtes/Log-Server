@@ -20,6 +20,10 @@ MongoClient.connect(url, function(err, db) {
     if (err) throw err;
     console.log("user register requests Collection created!");
   });
+  dbo.createCollection("chart_data",function(err,res){
+    if(err) throw err;
+    console.log("chart_data Collection created!")
+  })
   db.close();
 
 });
