@@ -30,12 +30,10 @@ app.controller('dashboardController', function($scope, $http) {
 				for (var i = length; i < index; i++) {
 					$scope.data[loglevel_index].push(0);
 				}
-				$scope.data[loglevel_index].splice(index, 0,chartdata.count);
+				$scope.data[loglevel_index][index]=chartdata.count;
 			}else{
-				$scope.data[loglevel_index].splice(index, 0,chartdata.count);
+				$scope.data[loglevel_index][index]=chartdata.count;
 			}
-			
-
 		}
 	});
 	
