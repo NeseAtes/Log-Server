@@ -97,25 +97,17 @@ var search = function(req,res,next){
     index: 'log',
     type: 'logs',
     body: {
-		query: {
-			bool: {
-				must: {
-					multi_match: {
-        				query:    value,
-        				fields:   ['app_name', 'description' , 'log_level']
-    				}
-				}
-				/*filter: {
-    				range: {
-    					id: {
-    						gt: 2,
-    						lt: 8
-    					}
-    				}
-    			}*/
-			}  
+	query: {
+		bool: {
+			must: {
+				must: [
+					{ "match": { "description": value }},
+ 				    	{ "match": { "user_id": userid   }}
+  				]
+			}
+		}  
     	}			
-	}
+}
     }).then((body) => {
     	//console.log("result ->", body);
         res.json(body.hits);
