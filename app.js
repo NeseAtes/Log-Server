@@ -14,9 +14,28 @@ var ws = require('./WS.js');
 ws.init(app);
 
 var db_connection=require('./lib/db');
+var bcrypt = require('bcrypt');
+
 db_connection.connectToServer(function(err){
-	console.log(err)
+  if(err) console.log(err)
+  var data={
+    username:"admin",
+    password:"admin",
+    role:"admin"
+  }
+  var database=db_connection.getDb();
+    bcrypt.hash(data.password, 10, function(err, hash) {
+      // Store hash in database
+      data.password=hash;
+      database.collection("users").insertOne(data, function(err,result){
+        if(err)
+          console.log(err)
+       });
+    });
+  
 });
+
+
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -46,8 +65,6 @@ app.use(function(err, req, res, next) {
   
   res.send(err);
 });
-
-
 
 app.listen(port);
 console.log('The server is on: ' + port);
