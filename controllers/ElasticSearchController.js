@@ -97,25 +97,17 @@ var search = function(req,res,next){
     index: 'log',
     type: 'logs',
     body: {
-		query: {
-			bool: {
-				must: {
-					multi_match: {
-        				query:    value,
-        				fields:   ['app_name', 'description' , 'log_level']
-    				}
-				}
-				/*filter: {
-    				range: {
-    					id: {
-    						gt: 2,
-    						lt: 8
-    					}
-    				}
-    			}*/
-			}  
+	query: {
+		bool: {
+			must: {
+				must: [
+					{ "match": { "description": value }},
+ 				    	{ "match": { "user_id": userid   }}
+  				]
+			}
+		}  
     	}			
-	}
+}
     }).then((body) => {
     	//console.log("result ->", body);
         res.json(body.hits);
@@ -173,26 +165,6 @@ var update = function(req,res,next){
 		return res.json(err)		
 	});
 }
-
-
-/*var bulklama = function(req,res,next){
-	var bulk = [];
-	conf.forEach(app_name=>{
-		bulk.push({index:{
-			index: 'log',
-			type: 'logs'
-		}
-	})
-	bulk.push(app_name)
-})
-client.bulk({body:bulk}, function(err,res){
-	if (err) {
-		console.log("basarisiz.",err)
-	} else {
-		console.log("%s basarili oldu.", conf.length)
-	}
-});
-}*/
 
 module.exports.createIndex=createIndex;
 module.exports.addDocument=addDocument;
